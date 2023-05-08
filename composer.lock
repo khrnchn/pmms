@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d9bb424b177b6e81ddbd4229c672965",
+    "content-hash": "2b7d776952eb10b9b602bec8b7c88ab4",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -279,6 +279,81 @@
                 }
             ],
             "time": "2023-01-15T23:15:59+00:00"
+        },
+        {
+            "name": "buildix/timex",
+            "version": "1.1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/buildix/timex.git",
+                "reference": "4efc6c793a215f1782baed22ad5f8d7eb35b84d6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/buildix/timex/zipball/4efc6c793a215f1782baed22ad5f8d7eb35b84d6",
+                "reference": "4efc6c793a215f1782baed22ad5f8d7eb35b84d6",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^v2.16.55",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.13.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^6.0",
+                "orchestra/testbench": "^7.0",
+                "pestphp/pest": "^1.21",
+                "pestphp/pest-plugin-laravel": "^1.1",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Buildix\\Timex\\TimexServiceProvider"
+                    ],
+                    "aliases": {
+                        "Timex": "Buildix\\Timex\\Facades\\Timex"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Buildix\\Timex\\": "src",
+                    "Buildix\\Timex\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mikhail Karzanov",
+                    "email": "mikrosmile@icloud.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Calendar plugin for filamentphp",
+            "homepage": "https://github.com/buildix/timex",
+            "keywords": [
+                "Buildix",
+                "filament",
+                "laravel",
+                "timex"
+            ],
+            "support": {
+                "issues": "https://github.com/buildix/timex/issues",
+                "source": "https://github.com/buildix/timex/tree/1.1.7"
+            },
+            "funding": [
+                {
+                    "url": "https://liberapay.com/mikrosmile",
+                    "type": "liberapay"
+                }
+            ],
+            "time": "2023-03-21T06:10:22+00:00"
         },
         {
             "name": "danharrin/date-format-converter",

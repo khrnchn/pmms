@@ -7,7 +7,7 @@
 
 ## About <a name = "about"></a>
 
-Petakom Mart Management System by our group for subject Software Engineering Practices.
+A Filament-based Petakom Mart Management System by our group for subject Software Engineering Practices. Developed using the Laravel framework.
 
 ## Getting Started <a name = "getting_started"></a>
 

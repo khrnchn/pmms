@@ -1,5 +1,9 @@
+
+
 <div align="center">
-    ![petakom-logo](https://github.com/khrnchn/pmms/assets/71305935/2ccb63dc-012f-486d-8da5-ddd137311cb2)
+    <a href="https://imgbb.com/">
+        <img src="https://i.ibb.co/xS6RZfh/petakom-logo.png" alt="petakom-logo" border="0">
+    </a>
     <h3 align="center">Petakom Mart Management System/ PetaKoop</h3>
 </div>
 

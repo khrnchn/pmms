@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             $table->string('path');
-            $table->string('generated_by');
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }

@@ -11,6 +11,6 @@ class Report extends Model
 
     protected $fillable = [
         'path',
-        'generated_by'
+        'user_id'
     ];
 }

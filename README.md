@@ -7,7 +7,7 @@
 
 ## About <a name = "about"></a>
 
-Write about 1-2 paragraphs describing the purpose of your project.
+A Filament-based Petakom Mart Management System by our group for subject Software Engineering Practices. Developed using the Laravel framework.
 
 ## Getting Started <a name = "getting_started"></a>
 
@@ -15,30 +15,41 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
-
-```
-Give examples
-```
+Have PHP, Composer, and node installed on your local machine. 
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running.
+1. Clone the repo.
 
-Say what the step will be
-
+2. Composer update.
 ```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+composer update
 ```
 
-End with an example of getting some data out of the system or using it for a little demo.
+3. Install node package manager.
+```
+npm install
+```
+
+4. Generate .env file.
+```
+cp .env.example .env
+php artisan key:generate
+```
+
+5. Populate the database.
+```
+php artisan migrate --seed
+```
+
+6. Run the project locally.
+```
+php artisan serve
+```
 
 ## Usage <a name = "usage"></a>
 
-Add notes about how to use the system.
+1. Login as different users (eg Admin/ Cashier/ Committee).
+2. Create inventory, sales.
+3. Manage employee's schedules.
+

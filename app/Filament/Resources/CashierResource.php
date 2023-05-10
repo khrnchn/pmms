@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\CashierResource\Pages;
 use App\Filament\Resources\CashierResource\RelationManagers;
 use App\Models\Sales;
@@ -17,7 +18,9 @@ class CashierResource extends Resource
 {
     protected static ?string $model = Sales::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationGroup = 'Shop';
+
+    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
     public static function form(Form $form): Form
     {
@@ -42,6 +45,10 @@ class CashierResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Generate Report'),
             ]);
     }
     

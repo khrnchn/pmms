@@ -62,3 +62,16 @@ php artisan serve
 2. Create inventory, sales.
 3. Manage employee's schedules.
 
+## ✍️ Authors <a name = "authors"></a>
+
+- [@ejjat0909](https://github.com/ejjat0909) - Izzat
+- [@khrnchn](https://github.com/khrnchn) - Khairin
+- [@AHisyam-coder](https://github.com/khrnchn) - Hisyam
+- [@CCCCheeee](https://github.com/khrnchn) - Chin
+
+<p width="100%">
+    <img width="23%" src="https://i.ibb.co/NSX1zSq/ijat.jpg"> 
+    <img width="23%" src="https://i.ibb.co/cJkJgyN/kc.jpg"> 
+    <img width="23%" src="https://i.ibb.co/t233xPJ/sye.jpg"> 
+    <img width="23%" src="https://i.ibb.co/RDt1xtD/chin.jpg"> 
+</p>

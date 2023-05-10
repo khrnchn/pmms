@@ -1,3 +1,8 @@
+<div align="center">
+    <img src="https://user-images.githubusercontent.com/41773797/131910226-676cb28a-332d-4162-a6a8-136a93d5a70f.png" alt="Banner" style="width: 100%; max-width: 800px;" />
+    <h3 align="center">Petakom Mart Management System/ PetaKoop</h3>
+</div>
+
 ## Table of Contents
 
 - [About](#about)

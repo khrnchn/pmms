@@ -10,9 +10,9 @@ class StatsOverview extends BaseWidget
     protected function getCards(): array
     {
         return [
-            Card::make('Unique views', '192.1k'),
-            Card::make('Bounce rate', '21%'),
-            Card::make('Average time on page', '3:12'),
+            Card::make('Total sales', 'MYR192,000.00'),
+            Card::make('Total inventories', '420'),
+            Card::make('Total profit', 'MYR192,000.00'),
         ];
     }
 }

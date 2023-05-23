@@ -10,7 +10,6 @@ class Inventory extends Model
     use HasFactory;
 
     protected $fillable = [
-
         'brand_id',
         'name',
         'sku',
@@ -19,7 +18,10 @@ class Inventory extends Model
         'old_price',
         'price',
         'cost'
-
-
     ];
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
 }

@@ -12,7 +12,10 @@ class Inventory extends Model
     protected $fillable = [
         'brand_id',
         'name',
+        'slug',
         'sku',
+        'description',
+        'qty',
         'security_stock',
         'is_visible',
         'old_price',

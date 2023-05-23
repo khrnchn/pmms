@@ -55,7 +55,7 @@ class ReportResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('download')
-                    ->icon('heroicon-o-arrow-down')
+                    ->icon('heroicon-o-download')
                     ->action(function (Model $record) {
                         return $record->pdf->stream();
                     }),

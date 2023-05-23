@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\BrandResource\RelationManagers\InventoriesRelationManager;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Filament\Resources\InventoryResource\RelationManagers;
+use App\Filament\Resources\InventoryResource\Widgets\InventoryOverview;
 use App\Models\Inventory;
+use Awcodes\Shout\Shout;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
@@ -16,6 +20,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Filament\Tables\Actions\Action;
 
 class InventoryResource extends Resource
 {
@@ -31,6 +36,22 @@ class InventoryResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
+
+                        Shout::make('danger')
+                            ->content(fn ($record) => $record->qty < $record->security_stock ? 'This inventory is low on stock!' : '')
+                            ->type('danger')
+                            ->hidden(
+                                function ($context, ?Inventory $record) {
+                                    if ($context == 'create') {
+                                        return true;
+                                    } elseif ($record->qty > $record->security_stock) {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            )
+                            ->columnSpan('full'),
+
                         Forms\Components\Card::make()
                             ->schema([
                                 Forms\Components\TextInput::make('name')
@@ -76,8 +97,7 @@ class InventoryResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('sku')
                                     ->label('SKU (Stock Keeping Unit)')
-                                    ->unique(Inventory::class, 'sku', ignoreRecord: true)
-                                    ->required(),
+                                    ->unique(Inventory::class, 'sku', ignoreRecord: true),
 
                                 Forms\Components\TextInput::make('qty')
                                     ->label('Quantity')
@@ -166,6 +186,9 @@ class InventoryResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+            ])->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Generate report'),
             ]);
     }
 
@@ -173,6 +196,13 @@ class InventoryResource extends Resource
     {
         return [
             //
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            InventoryOverview::class,
         ];
     }
 

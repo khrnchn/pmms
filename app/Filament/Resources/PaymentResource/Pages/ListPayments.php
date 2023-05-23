@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\CashierResource\Pages;
+namespace App\Filament\Resources\PaymentResource\Pages;
 
-use App\Filament\Resources\CashierResource;
+use App\Filament\Resources\PaymentResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListCashiers extends ListRecords
+class ListPayments extends ListRecords
 {
-    protected static string $resource = CashierResource::class;
+    protected static string $resource = PaymentResource::class;
 
     protected function getActions(): array
     {

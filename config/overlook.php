@@ -1,13 +1,13 @@
 <?php
 
-use App\Filament\Resources\CashierResource;
+use App\Filament\Resources\SaleResource;
 use App\Filament\Resources\ReportResource;
 use App\Filament\Resources\UserResource;
 
 return [
     'includes' => [
         UserResource::class,
-        CashierResource::class,
+        SaleResource::class,
         ReportResource::class,
     ],
     'excludes' => [

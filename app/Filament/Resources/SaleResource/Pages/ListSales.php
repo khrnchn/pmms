@@ -16,4 +16,9 @@ class ListSales extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return SaleResource::getWidgets();
+    }
 }

@@ -5,7 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Sales extends Model
+class SaleInventory extends Model
 {
     use HasFactory;
+
+    /**
+     * @var string
+     */
+    protected $table = 'sale_inventories';
 }

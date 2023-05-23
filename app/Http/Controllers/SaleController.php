@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SalesItem;
-use App\Http\Requests\StoreSalesItemRequest;
-use App\Http\Requests\UpdateSalesItemRequest;
+use App\Models\Sale;
+use App\Http\Requests\StoreSalesRequest;
+use App\Http\Requests\UpdateSalesRequest;
 
-class SalesItemController extends Controller
+class SaleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class SalesItemController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSalesItemRequest $request)
+    public function store(StoreSalesRequest $request)
     {
         //
     }
@@ -35,7 +35,7 @@ class SalesItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(SalesItem $salesItem)
+    public function show(Sale $sales)
     {
         //
     }
@@ -43,7 +43,7 @@ class SalesItemController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SalesItem $salesItem)
+    public function edit(Sale $sales)
     {
         //
     }
@@ -51,7 +51,7 @@ class SalesItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSalesItemRequest $request, SalesItem $salesItem)
+    public function update(UpdateSalesRequest $request, Sale $sales)
     {
         //
     }
@@ -59,7 +59,7 @@ class SalesItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SalesItem $salesItem)
+    public function destroy(Sale $sales)
     {
         //
     }

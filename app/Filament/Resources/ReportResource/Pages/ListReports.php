@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ReportResource\Pages;
 
-use App\Filament\Resources\CashierResource\Widgets\SalesOverview;
 use App\Filament\Resources\ReportResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;

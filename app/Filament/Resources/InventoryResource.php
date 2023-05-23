@@ -2,20 +2,20 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\BrandResource\RelationManagers\InventoriesRelationManager;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Filament\Resources\InventoryResource\RelationManagers;
 use App\Models\Inventory;
 use Filament\Forms;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextInput\Mask;
+use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class InventoryResource extends Resource
 {
@@ -29,37 +29,137 @@ class InventoryResource extends Resource
     {
         return $form
             ->schema([
-                // this will handle the create inventory form
-                TextInput::make('name')
-                    ->required(),
-                TextInput::make('security_stock')
-                    ->default(3)
-                    ->disabled(),
-                TextInput::make('price')
-                    ->required()
-                    ->numeric()
-                    ->mask(
-                        fn (Mask $mask) => $mask
-                            ->numeric()
-                            ->decimalPlaces(2)
-                            ->decimalSeparator('.')
-                    ),
-            ]);
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Card::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->lazy()
+                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+
+                                Forms\Components\TextInput::make('slug')
+                                    ->disabled()
+                                    ->required()
+                                    ->unique(Inventory::class, 'slug', ignoreRecord: true),
+
+                                Forms\Components\MarkdownEditor::make('description')
+                                    ->columnSpan('full'),
+                            ])
+                            ->columns(2),
+
+                        Forms\Components\Section::make('Pricing')
+                            ->schema([
+                                Forms\Components\TextInput::make('price')
+                                    ->numeric()
+                                    ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                                    ->columnSpan(1)
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('old_price')
+                                    ->label('Compare at price')
+                                    ->numeric()
+                                    ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                                    ->columnSpan(1)
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('cost')
+                                    ->label('Cost per item')
+                                    ->helperText('Customers won\'t see this price.')
+                                    ->numeric()
+                                    ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                                    ->columnSpan(1)
+                                    ->required(),
+                            ])
+                            ->columns(3),
+                        Forms\Components\Section::make('Inventory')
+                            ->schema([
+                                Forms\Components\TextInput::make('sku')
+                                    ->label('SKU (Stock Keeping Unit)')
+                                    ->unique(Inventory::class, 'sku', ignoreRecord: true)
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('qty')
+                                    ->label('Quantity')
+                                    ->numeric()
+                                    ->rules(['integer', 'min:0'])
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('security_stock')
+                                    ->helperText('The safety stock is the limit stock for your inventories which alerts you if the inventories stock will soon be out of stock.')
+                                    ->numeric()
+                                    ->rules(['integer', 'min:0'])
+                                    ->default(10)
+                                    ->required(),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->columnSpan(['lg' => 2]),
+
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Misc')
+                            ->schema([
+                                Forms\Components\Toggle::make('is_visible')
+                                    ->label('Visible')
+                                    ->inline(false)
+                                    ->helperText('This inventory will be hidden from all sales channels.'),
+
+                                Forms\Components\Select::make('brand_id')
+                                    ->relationship('brand', 'name')
+                                    ->searchable()
+                                    ->hiddenOn(InventoriesRelationManager::class),
+                            ]),
+                    ])
+                    ->columnSpan(['lg' => 1]),
+            ])
+            ->columns(3);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                ->sortable()
-                ->searchable(),
-                TextColumn::make('security_stock'),
-                TextColumn::make('price')
-                    ->label('Price in MYR'),
+
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Name')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('brand.name')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('price')
+                    ->label('Price')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('sku')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('qty')
+                    ->label(__('Quantity'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('security_stock')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable()
+                    ->toggledHiddenByDefault(),
+
+                Tables\Columns\BooleanColumn::make('is_visible')
+                    ->label('Visibility')
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->filters([
-
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -65,8 +65,8 @@ return [
 
     'pages' => [
         'timex' => \Buildix\Timex\Pages\Timex::class,
-        'slug' => 'timex',
-        'group' => 'timex',
+        'slug' => 'roster',
+        'group' => 'roster',
         'sort' => 0,
         'shouldRegisterNavigation' => true,
         'enablePolicy' => false,

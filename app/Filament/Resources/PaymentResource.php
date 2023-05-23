@@ -35,36 +35,6 @@ class PaymentResource extends Resource
                 ->disabled()
                 ->required(),
 
-            Forms\Components\Select::make('shop_customer_id')
-                ->relationship('customer', 'name')
-                ->searchable()
-                ->required()
-                ->createOptionForm([
-                    Forms\Components\TextInput::make('name')
-                        ->required(),
-
-                    Forms\Components\TextInput::make('email')
-                        ->required()
-                        ->email()
-                        ->unique(),
-
-                    Forms\Components\TextInput::make('phone'),
-
-                    Forms\Components\Select::make('gender')
-                        ->placeholder('Select gender')
-                        ->options([
-                            'male' => 'Male',
-                            'female' => 'Female',
-                        ])
-                        ->required(),
-                ])
-                ->createOptionAction(function (Forms\Components\Actions\Action $action) {
-                    return $action
-                        ->modalHeading('Create customer')
-                        ->modalButton('Create customer')
-                        ->modalWidth('lg');
-                }),
-
             Forms\Components\Select::make('status')
                 ->options([
                     'new' => 'New',

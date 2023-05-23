@@ -2,19 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PaymentMethod;
 use App\Filament\Resources\SaleResource\Pages;
 use App\Filament\Resources\SaleResource\RelationManagers;
 use App\Filament\Resources\SaleResource\Widgets\SaleStats;
 use App\Models\Inventory;
 use App\Models\Sale;
+use Closure;
 use Illuminate\Support\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Placeholder;
 use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -67,36 +71,110 @@ class SaleResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('inventory_id')
                             ->label('Item')
+                            ->searchable()
                             ->options(Inventory::query()->pluck('name', 'id'))
                             ->required()
                             ->reactive()
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('unit_price', Inventory::find($state)?->price ?? 0))
-                            ->columnSpan(2),
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $set('unit_price', Inventory::find($state)?->price ?? 0);
+                            })
+                            ->columnSpan(4),
 
                         Forms\Components\TextInput::make('qty')
                             ->label('Quantity')
                             ->numeric()
-                            ->minValue(1)
-                            ->default(1)
-                            ->required(),
+                            ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                            ->required()
+                            ->reactive()
+                            ->disabled(fn (callable $get) => blank($get('inventory_id')))
+                            ->afterStateUpdated(function ($get, callable $set) {
+                                $unitPrice = $get('unit_price') ?? 0;
+                                $qty = $get('qty') ?? 1;
+                                $total = $unitPrice * $qty;
+                                $set('total', $total);
+                            })
+                            ->columnSpan(2),
 
                         Forms\Components\TextInput::make('unit_price')
-                            ->label('Unit Price')
+                            ->label('Unit Price (MYR)')
+                            ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
                             ->disabled()
                             ->numeric()
                             ->required()
+                            ->columnSpan(1),
+
+                        Forms\Components\TextInput::make('total')
+                            ->label('Total (MYR)')
+                            ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                            ->disabled()
+                            ->required()
+                            ->numeric()
+                            ->columnSpan(1),
                     ])
                     ->defaultItems(1)
                     ->disableLabel()
                     ->columnSpan(4)
                     ->columns(4)
                     ->required(),
+
+                Card::make()
+                    ->schema([
+                        Placeholder::make("total_price")
+                            ->label("Total Price (MYR)")
+                            ->content(function ($get) {
+                                return collect($get('inventories'))
+                                    ->pluck('total')
+                                    ->sum();
+                            }),
+                    ])
+                    ->inlineLabel()
+                    ->columnSpan(4)
             ];
         }
 
         return [
-            Forms\Components\Section::make('Payment')
-                ->schema(PaymentResource::getFormSchema()),
+            Card::make()
+                ->schema([
+                    Placeholder::make("total_price_next")
+                        ->label("Total Price (MYR)")
+                        ->content(function ($get) {
+                            return collect($get('inventories'))
+                                ->pluck('total')
+                                ->sum();
+                        }),
+                ])
+                ->inlineLabel()
+                ->columnSpan('full'),
+
+            Forms\Components\TextInput::make('payable_amount')
+                ->label("Paid Amount (MYR)")
+                ->numeric()
+                ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                    $totalPrice = collect($get('inventories'))
+                        ->pluck('total')
+                        ->sum();
+                    $paidAmt = $state;
+                    $balanceAmt = $paidAmt - $totalPrice;
+                    $set('balance_amount', $balanceAmt);
+                }),
+
+            Forms\Components\TextInput::make('balance_amount')
+                ->label("Balance Amount (MYR)")
+                ->numeric()
+                ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                ->disabled()
+                ->required(),
+
+            Forms\Components\Select::make('method')
+                ->options([
+                    PaymentMethod::Cash => 'Cash',
+                    PaymentMethod::QRCode => 'QR Code',
+                    PaymentMethod::BankAccount => 'Bank transfer',
+                ])
+                ->required(),
         ];
     }
 

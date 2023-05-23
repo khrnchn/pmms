@@ -43,8 +43,9 @@ class CreateSale extends CreateRecord
 
             Step::make('Payment')
                 ->schema([
-                    Card::make(PaymentResource::getFormSchema()),
+                    Card::make(SaleResource::getFormSchema()),
                 ]),
         ];
     }
+
 }

@@ -66,12 +66,10 @@ php artisan serve
 
 - [@ejjat0909](https://github.com/ejjat0909) - Izzat
 - [@khrnchn](https://github.com/khrnchn) - Khairin
-- [@AHisyam-coder](https://github.com/khrnchn) - Hisyam
-- [@CCCCheeee](https://github.com/khrnchn) - Chin
+- [@AHisyam-coder](https://github.com/ahisyam-coder) - Hisyam
 
 <p width="100%">
     <img width="23%" src="https://i.ibb.co/NSX1zSq/ijat.jpg"> 
     <img width="23%" src="https://i.ibb.co/cJkJgyN/kc.jpg"> 
     <img width="23%" src="https://i.ibb.co/t233xPJ/sye.jpg"> 
-    <img width="23%" src="https://i.ibb.co/RDt1xtD/chin.jpg"> 
 </p>

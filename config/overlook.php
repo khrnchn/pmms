@@ -1,5 +1,6 @@
 <?php
 
+use App\Filament\Resources\BrandResource;
 use App\Filament\Resources\CashierResource;
 use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\ReportResource;
@@ -10,6 +11,7 @@ return [
         InventoryResource::class,
         CashierResource::class,
         ReportResource::class,
+        BrandResource::class,
         UserResource::class,
     ],
     'excludes' => [

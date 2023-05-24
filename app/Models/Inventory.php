@@ -27,4 +27,9 @@ class Inventory extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+
+    public function dailyStocks()
+    {
+        return $this->hasMany(DailyStock::class);
+    }
 }

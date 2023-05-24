@@ -44,7 +44,6 @@ class BrandResource extends Resource
                                     ->unique(Brand::class, 'slug', ignoreRecord: true),
                             ]),
                         Forms\Components\TextInput::make('website')
-                            ->required()
                             ->url(),
 
                         Forms\Components\Toggle::make('is_visible')

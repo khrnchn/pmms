@@ -6,7 +6,9 @@ use App\Enums\PaymentMethod;
 use App\Filament\Resources\SaleResource\Pages;
 use App\Filament\Resources\SaleResource\RelationManagers;
 use App\Filament\Resources\SaleResource\Widgets\SaleStats;
+use App\Forms\Components\PaymentForm;
 use App\Models\Inventory;
+use App\Models\Payment;
 use App\Models\Sale;
 use Closure;
 use Illuminate\Support\Carbon;
@@ -21,6 +23,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Request;
 
 class SaleResource extends Resource
 {
@@ -36,13 +39,11 @@ class SaleResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Card::make()
-                            ->schema(static::getFormSchema())
-                            ->columns(2),
-
                         Forms\Components\Section::make('Buy item(s)')
                             ->schema(static::getFormSchema('inventories')),
 
+                        Forms\Components\Card::make()
+                            ->schema(static::getFormSchema()),
                     ])
                     ->columnSpan(['lg' => fn (?Sale $record) => $record === null ? 3 : 2]),
 
@@ -58,7 +59,7 @@ class SaleResource extends Resource
                     ])
                     ->columnSpan(['lg' => 1])
                     ->hidden(fn (?Sale $record) => $record === null),
-            ]);
+            ])->columns(3);
     }
 
     public static function getFormSchema(?string $section = null): array
@@ -72,13 +73,16 @@ class SaleResource extends Resource
                         Forms\Components\Select::make('inventory_id')
                             ->label('Item')
                             ->searchable()
-                            ->options(Inventory::query()->pluck('name', 'id'))
+                            ->options(function () {
+                                return Inventory::where('qty', '>', 0)->pluck('name', 'id');
+                            })
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 $set('unit_price', Inventory::find($state)?->price ?? 0);
                             })
-                            ->columnSpan(4),
+                            ->columns(3)
+                            ->columnSpan(2),
 
                         Forms\Components\TextInput::make('qty')
                             ->label('Quantity')
@@ -93,7 +97,7 @@ class SaleResource extends Resource
                                 $total = $unitPrice * $qty;
                                 $set('total', $total);
                             })
-                            ->columnSpan(2),
+                            ->columns(1),
 
                         Forms\Components\TextInput::make('unit_price')
                             ->label('Unit Price (MYR)')
@@ -101,7 +105,7 @@ class SaleResource extends Resource
                             ->disabled()
                             ->numeric()
                             ->required()
-                            ->columnSpan(1),
+                            ->columns(1),
 
                         Forms\Components\TextInput::make('total')
                             ->label('Total (MYR)')
@@ -109,26 +113,30 @@ class SaleResource extends Resource
                             ->disabled()
                             ->required()
                             ->numeric()
-                            ->columnSpan(1),
+                            ->columns(1),
                     ])
                     ->defaultItems(1)
                     ->disableLabel()
-                    ->columnSpan(4)
-                    ->columns(4)
-                    ->required(),
+                    ->columns(5)
+                    ->columnSpan(2)
+                    ->required()
+                    ->dehydrated(),
 
                 Card::make()
                     ->schema([
                         Placeholder::make("total_price")
                             ->label("Total Price (MYR)")
                             ->content(function ($get) {
-                                return collect($get('inventories'))
+                                $total = collect($get('inventories'))
                                     ->pluck('total')
                                     ->sum();
+
+                                Request::session()->put('total_price', $total);
+
+                                return $total;
                             }),
                     ])
                     ->inlineLabel()
-                    ->columnSpan(4)
             ];
         }
 
@@ -137,11 +145,7 @@ class SaleResource extends Resource
                 ->schema([
                     Placeholder::make("total_price_next")
                         ->label("Total Price (MYR)")
-                        ->content(function ($get) {
-                            return collect($get('inventories'))
-                                ->pluck('total')
-                                ->sum();
-                        }),
+                        ->content(Request::session()->get('total_price')),
                 ])
                 ->inlineLabel()
                 ->columnSpan('full'),
@@ -152,21 +156,21 @@ class SaleResource extends Resource
                 ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
                 ->required()
                 ->reactive()
-                ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                    $totalPrice = collect($get('inventories'))
-                        ->pluck('total')
-                        ->sum();
+                ->afterStateUpdated(function ($state, callable $set) {
+                    $totalPrice = Request::session()->get('total_price');
                     $paidAmt = $state;
                     $balanceAmt = $paidAmt - $totalPrice;
                     $set('balance_amount', $balanceAmt);
-                }),
+                })
+                ->columns(1),
 
             Forms\Components\TextInput::make('balance_amount')
                 ->label("Balance Amount (MYR)")
                 ->numeric()
                 ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
                 ->disabled()
-                ->required(),
+                ->required()
+                ->columns(1),
 
             Forms\Components\Select::make('method')
                 ->options([
@@ -174,7 +178,8 @@ class SaleResource extends Resource
                     PaymentMethod::QRCode => 'QR Code',
                     PaymentMethod::BankAccount => 'Bank transfer',
                 ])
-                ->required(),
+                ->required()
+                ->columns(1),
         ];
     }
 
@@ -240,13 +245,6 @@ class SaleResource extends Resource
             ]);
     }
 
-    // public static function getRelations(): array
-    // {
-    //     return [
-    //         RelationManagers\PaymentsRelationManager::class,
-    //     ];
-    // }
-
     public static function getWidgets(): array
     {
         return [
@@ -266,5 +264,15 @@ class SaleResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScope(SoftDeletingScope::class);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['user.name'];
+    }
+
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['user', 'inventories']);
     }
 }

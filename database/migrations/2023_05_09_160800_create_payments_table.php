@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Sale::class);
-            $table->string('method');
+            $table->foreignId('sale_id')->constrained();
+            $table->integer('method');
             $table->decimal('payable_amount', 12, 2);
             $table->decimal('balance_amount', 12, 2);
             $table->timestamps();

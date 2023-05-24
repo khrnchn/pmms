@@ -27,26 +27,6 @@ class PaymentResource extends Resource
             ]);
     }
 
-    public static function getFormSchema(?string $section = null): array
-    {
-        return [
-            Forms\Components\TextInput::make('number')
-                ->default('OR-' . random_int(100000, 999999))
-                ->disabled()
-                ->required(),
-
-            Forms\Components\Select::make('status')
-                ->options([
-                    'new' => 'New',
-                    'processing' => 'Processing',
-                    'shipped' => 'Shipped',
-                    'delivered' => 'Delivered',
-                    'cancelled' => 'Cancelled',
-                ])
-                ->required(),
-        ];
-    }
-
     public static function table(Table $table): Table
     {
         return $table

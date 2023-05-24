@@ -9,6 +9,13 @@ class SaleInventory extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'inventory_id',
+        'qty',
+        'unit_price',
+        'total'
+    ];
+
     /**
      * @var string
      */

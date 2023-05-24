@@ -42,13 +42,15 @@ class ListInventories extends ListRecords
                 })
                 ->form([
                     TableRepeater::make('dailystocks')
+                        ->defaultItems(Inventory::count())
+                        ->disableItemDeletion()
                         ->label(__('Daily stock record'))
                         ->relationship('dailyStocks')
                         ->hideLabels()
                         ->schema([
                             Select::make('inventory_id')
                                 ->label(__('Inventory'))
-                                ->options(Inventory::pluck('name', 'id')),
+                                ->options(Inventory::pluck('name', 'id')), 
 
                             TextInput::make('before')
                                 ->label(__('Opening'))

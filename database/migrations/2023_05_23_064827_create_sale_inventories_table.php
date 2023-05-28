@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('sale_inventories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sales_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('sale_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('inventory_id')->nullable()->constrained()->cascadeOnDelete();
             $table->integer('qty');
             $table->decimal('unit_price', 10, 2);
+            //qty x unit_price
+            $table->decimal('total', 10, 2);
             $table->timestamps();
             $table->softDeletes();
         });

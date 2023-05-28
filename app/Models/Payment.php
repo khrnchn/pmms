@@ -10,6 +10,13 @@ class Payment extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'sale_id',
+        'method',
+        'payable_amount',
+        'balance_amount'
+    ];
+
     protected $table = 'payments';
 
     protected $guarded = [];

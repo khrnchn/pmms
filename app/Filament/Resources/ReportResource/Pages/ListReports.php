@@ -14,16 +14,12 @@ class ListReports extends ListRecords
 
     protected function getActions(): array
     {
-        return [
-            
-        ];
+        return [];
     }
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            SalesOverview::class,
-        ];
+        return [];
     }
 
     protected function getTableRecordUrlUsing(): ?Closure

@@ -63,10 +63,6 @@ class CashierResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCashiers::route('/'),
-            'create' => Pages\CreateCashier::route('/create'),
-            'view' => Pages\ViewCashier::route('/{record}'),
-            'edit' => Pages\EditCashier::route('/{record}/edit'),
         ];
     }    
 }

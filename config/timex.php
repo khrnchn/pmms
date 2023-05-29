@@ -17,6 +17,7 @@ return [
 
     'prefix' => 'timex',
 
+
     /*
     |--------------------------------------------------------------------------
     | TIMEX Mini widget
@@ -151,7 +152,7 @@ return [
         'event' => RosterResource::class,
         'sort' => 1,
         'icon' => 'heroicon-o-calendar',
-        'slug' => 'timex-events',
+        'slug' => 'timex-rosters',
         'shouldRegisterNavigation' => true,
         'isStartEndHidden' => false,
     ],

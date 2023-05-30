@@ -8,6 +8,7 @@ use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\InventoryResource\Widgets\InventoryOverview;
 use App\Models\DailyStock;
 use App\Models\Inventory;
+use App\Models\Payment;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
@@ -26,6 +27,7 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ListInventories extends ListRecords
@@ -73,6 +75,10 @@ class ListInventories extends ListRecords
                                 ])->whereBetween('created_at', [$start, $end])
                                     ->value('qty');
 
+                                $item['closing'] = Inventory::where([
+                                    'id' => $key,
+                                ])->value('qty');
+
                                 array_push($data, $item);
                             }
 
@@ -81,6 +87,9 @@ class ListInventories extends ListRecords
                         }),
 
                     TableRepeater::make('stockArray')
+                        ->columnWidths([
+                            'name' => '300px',
+                        ])
                         ->default(function ($get) {
                             $stockArray = $get('stockArray');
                             $defaultItems = [];
@@ -92,6 +101,7 @@ class ListInventories extends ListRecords
                                         'name' => $item['name'],
                                         'before' => $item['opening'],
                                         'sold' => $item['sold'],
+                                        'after' => $item['closing'],
                                     ];
                                 }
                             }
@@ -125,18 +135,30 @@ class ListInventories extends ListRecords
                                 ->label(__('Restock'))
                                 ->numeric()
                                 ->reactive()
+                                ->afterStateUpdated(function ($state, callable $set, $get) {
+                                })
                                 ->default(0),
 
                             TextInput::make('damaged')
                                 ->label(__('Damaged'))
                                 ->numeric()
                                 ->reactive()
+                                ->afterStateUpdated(function ($get, callable $set) {
+                                })
                                 ->default(0),
 
                             TextInput::make('after')
                                 ->label(__('Closing'))
                                 ->numeric()
-                                ->disabled(),
+                                ->disabled()
+                                ->default(function ($get, callable $set) {
+                                    $before = $get('before') ?? 0;
+                                    $sold = $get('sold') ?? 0;
+                                    $damaged = $get('damaged') ?? 0;
+                                    $restock = $get('restock') ?? 0;
+                                    $after = $before - $sold + $restock - $damaged;
+                                    $set('after', $after);
+                                }),
                         ]),
 
                     Group::make()->schema([
@@ -176,7 +198,6 @@ class ListInventories extends ListRecords
                             ->columns(3)
                             ->columnSpan(2),
                     ])->columns(4),
-
                 ]),
 
             Actions\CreateAction::make()

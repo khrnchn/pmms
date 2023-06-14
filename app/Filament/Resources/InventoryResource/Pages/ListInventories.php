@@ -4,11 +4,14 @@ namespace App\Filament\Resources\InventoryResource\Pages;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+use App\Enums\PaymentMethod;
 use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\InventoryResource\Widgets\InventoryOverview;
 use App\Models\DailyStock;
 use App\Models\Inventory;
 use App\Models\Payment;
+use App\Models\Sale;
+use App\Models\SaleInventory;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
@@ -65,15 +68,19 @@ class ListInventories extends ListRecords
 
                                 $start = Carbon::yesterday()->startOfDay();
                                 $end = Carbon::yesterday()->endOfDay();
+
+                                $startToday = Carbon::today()->startOfDay();
+                                $endToday = Carbon::today()->endOfDay();
+
                                 $item['opening'] = DailyStock::where([
                                     'inventory_id' => $key,
                                 ])->whereBetween('created_at', [$start, $end])
                                     ->value('after');
 
-                                $item['sold'] = SalesItem::where([
+                                $item['sold'] = SaleInventory::where([
                                     'inventory_id' => $key,
-                                ])->whereBetween('created_at', [$start, $end])
-                                    ->value('qty');
+                                ])->whereBetween('created_at', [$startToday, $endToday])
+                                    ->sum('qty');
 
                                 $item['closing'] = Inventory::where([
                                     'id' => $key,
@@ -165,16 +172,28 @@ class ListInventories extends ListRecords
                         Fieldset::make('Transactions')
                             ->schema([
                                 Placeholder::make('cash')
+                                    ->content(
+                                        Payment::where('method', PaymentMethod::Cash)
+                                            ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
+                                            ->sum(DB::raw('payable_amount - balance_amount')),
+                                    )
                                     ->disabled()
-                                    ->content('RM 3.00')
                                     ->columnSpan(1),
                                 Placeholder::make('qr')
+                                    ->content(
+                                        Payment::where('method', PaymentMethod::QRCode)
+                                            ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
+                                            ->sum(DB::raw('payable_amount - balance_amount')),
+                                    )
                                     ->disabled()
-                                    ->content('RM 6.00')
                                     ->columnSpan(1),
                                 Placeholder::make('banking')
+                                    ->content(
+                                        Payment::where('method', PaymentMethod::BankAccount)
+                                            ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
+                                            ->sum(DB::raw('payable_amount - balance_amount')),
+                                    )
                                     ->disabled()
-                                    ->content('RM 9.00')
                                     ->columnSpan(1),
                             ])
                             ->columns(3)
@@ -183,19 +202,18 @@ class ListInventories extends ListRecords
                         Fieldset::make('Summary')
                             ->schema([
                                 Placeholder::make('gross_sale')
+                                    ->content(
+                                        Payment::whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
+                                            ->sum(DB::raw('payable_amount - balance_amount')),
+                                    )
                                     ->disabled()
-                                    ->content('RM 12.00')
-                                    ->columnSpan(1),
-                                Placeholder::make('net_sale')
-                                    ->disabled()
-                                    ->content('RM 12.00')
                                     ->columnSpan(1),
                                 Placeholder::make('profit')
+                                    ->content('tak buat lagi')
                                     ->disabled()
-                                    ->content('RM 12.00')
                                     ->columnSpan(1),
                             ])
-                            ->columns(3)
+                            ->columns(2)
                             ->columnSpan(2),
                     ])->columns(4),
                 ]),

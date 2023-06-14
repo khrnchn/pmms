@@ -12,6 +12,5 @@ class DailyStockSeeder extends Seeder
      */
     public function run(): void
     {
-        //
     }
 }

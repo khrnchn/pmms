@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\PaymentMethod;
 use App\Filament\Resources\SaleResource\Pages;
 use App\Filament\Resources\SaleResource\RelationManagers;
@@ -20,6 +21,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -195,9 +197,12 @@ class SaleResource extends Resource
                 Tables\Columns\TextColumn::make('total_price')
                     ->sortable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->sortable()
-                    ->toggleable(),
+                BadgeColumn::make('status')
+                    ->colors([
+                        'warning' => static fn ($state): bool => $state === 'pending',
+                        'success' => static fn ($state): bool => $state === 'success',
+                        'danger' => static fn ($state): bool => $state === 'failed',
+                    ]),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -242,7 +247,11 @@ class SaleResource extends Resource
                             ->warning()
                             ->send();
                     }),
-            ]);
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Generate report'),
+            ]);;
     }
 
     public static function getWidgets(): array

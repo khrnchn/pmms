@@ -77,13 +77,6 @@ class InventoryResource extends Resource
                                     ->columnSpan(1)
                                     ->required(),
 
-                                Forms\Components\TextInput::make('old_price')
-                                    ->label('Compare at price')
-                                    ->numeric()
-                                    ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
-                                    ->columnSpan(1)
-                                    ->required(),
-
                                 Forms\Components\TextInput::make('cost')
                                     ->label('Cost per item')
                                     ->helperText('Customers won\'t see this price.')
@@ -92,12 +85,9 @@ class InventoryResource extends Resource
                                     ->columnSpan(1)
                                     ->required(),
                             ])
-                            ->columns(3),
+                            ->columns(2),
                         Forms\Components\Section::make('Inventory')
                             ->schema([
-                                Forms\Components\TextInput::make('sku')
-                                    ->label('SKU (Stock Keeping Unit)')
-                                    ->unique(Inventory::class, 'sku', ignoreRecord: true),
 
                                 Forms\Components\TextInput::make('qty')
                                     ->label('Quantity')
@@ -123,11 +113,13 @@ class InventoryResource extends Resource
                                 Forms\Components\Toggle::make('is_visible')
                                     ->label('Visible')
                                     ->inline(false)
+                                    ->default(true)
                                     ->helperText('This inventory will be hidden from all sales channels.'),
 
                                 Forms\Components\Select::make('brand_id')
                                     ->relationship('brand', 'name')
                                     ->searchable()
+                                    ->required()
                                     ->hiddenOn(InventoriesRelationManager::class),
                             ]),
                     ])
@@ -155,11 +147,6 @@ class InventoryResource extends Resource
                     ->label('Price')
                     ->searchable()
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('sku')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('qty')
                     ->label(__('Quantity'))

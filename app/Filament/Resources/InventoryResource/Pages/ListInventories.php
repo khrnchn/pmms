@@ -29,6 +29,7 @@ use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -40,17 +41,25 @@ class ListInventories extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\Action::make('closing')
+            Actions\Action::make('report')
                 ->slideOver()
-                ->icon('heroicon-o-lock-closed')
+                ->icon('heroicon-o-document-report')
                 ->color('success')
-                ->action(function ($livewire, ?Inventory $record): void {
-                    // save in DailyStock
+                ->action(function ($livewire, $data): void {
+
+                    // trying to access stockArray from table repeater
+
+                    // save in Daily Stocks
+
+                    // notification
+                    Notification::make('report')
+                        ->success()
+                        ->send();
 
                     // generate report
 
                     // redirect 
-                    $livewire->redirect(InventoryResource::getURL('index'));
+                    // $livewire->redirect(InventoryResource::getURL('index'));
                 })
                 ->form([
                     TextInput::make('date')
@@ -97,7 +106,7 @@ class ListInventories extends ListRecords
                         ->columnWidths([
                             'name' => '300px',
                         ])
-                        ->default(function ($get) {
+                        ->default(function ($get, callable $set) {
                             $stockArray = $get('stockArray');
                             $defaultItems = [];
 
@@ -142,16 +151,14 @@ class ListInventories extends ListRecords
                                 ->label(__('Restock'))
                                 ->numeric()
                                 ->reactive()
-                                ->afterStateUpdated(function ($state, callable $set, $get) {
-                                })
+                                ->afterStateUpdated(fn ($get, $state, callable $set) => $set('after', $get('after') + $state))
                                 ->default(0),
 
                             TextInput::make('damaged')
                                 ->label(__('Damaged'))
                                 ->numeric()
                                 ->reactive()
-                                ->afterStateUpdated(function ($get, callable $set) {
-                                })
+                                ->afterStateUpdated(fn ($get, $state, callable $set) => $set('after', $get('after') + $state))
                                 ->default(0),
 
                             TextInput::make('after')
@@ -180,6 +187,7 @@ class ListInventories extends ListRecords
                                     ->disabled()
                                     ->columnSpan(1),
                                 Placeholder::make('qr')
+                                    ->label('QR Pay')
                                     ->content(
                                         Payment::where('method', PaymentMethod::QRCode)
                                             ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])

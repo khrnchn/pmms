@@ -175,7 +175,7 @@ class InventoryResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])->headerActions([
                 FilamentExportHeaderAction::make('export')
-                    ->label('Generate report'),
+                    ->label('Inventory report'),
             ]);
     }
 

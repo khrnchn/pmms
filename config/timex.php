@@ -1,8 +1,5 @@
 <?php
 
-use App\Filament\Resources\RosterResource;
-use App\Models\Category;
-use App\Models\Roster;
 use Carbon\Carbon;
 
 return [
@@ -65,8 +62,8 @@ return [
 
     'pages' => [
         'timex' => \Buildix\Timex\Pages\Timex::class,
-        'slug' => 'roster',
-        'group' => 'roster',
+        'slug' => 'timex',
+        'group' => 'timex',
         'sort' => 0,
         'shouldRegisterNavigation' => true,
         'enablePolicy' => false,
@@ -148,7 +145,7 @@ return [
     ],
 
     'resources' => [
-        'event' => RosterResource::class,
+        'event' => \Buildix\Timex\Resources\EventResource::class,
         'sort' => 1,
         'icon' => 'heroicon-o-calendar',
         'slug' => 'timex-events',
@@ -156,7 +153,7 @@ return [
         'isStartEndHidden' => false,
     ],
     'models' => [
-        'event' => Roster::class,
+        'event' => \Buildix\Timex\Models\Event::class,
         'users' => [
             'model' => \App\Models\User::class,
             'name' => 'name',
@@ -165,10 +162,10 @@ return [
     ],
     'tables' => [
         'event' => [
-            'name' => 'rosters',
+            'name' => 'timex_events',
         ],
         'category' => [
-            'name' => 'categories',
+            'name' => 'timex_categories',
         ],
     ],
 
@@ -197,7 +194,7 @@ return [
     |
     */
             'model' => [
-                'class' => Category::class, // \App\Models\Category::class
+                'class' => \Buildix\Timex\Models\Category::class, // \App\Models\Category::class
                 'key' => 'id', // "id" is a DB column - you can change by any primary key
                 'value' => 'value', // "value" is a DB column - it used for Select options and displays on Resource page
                 'icon' => 'icon', // "icon" is a DB column - define here any heroicon- icon

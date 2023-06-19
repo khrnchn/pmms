@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SaleResource\Pages;
 
+use App\Filament\Resources\PaymentResource;
 use App\Filament\Resources\SaleResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -14,6 +15,9 @@ class ListSales extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            Actions\Action::make('Payment list')->action(function ($livewire): void {
+                $livewire->redirect(PaymentResource::getUrl('index'));
+            }),
         ];
     }
 

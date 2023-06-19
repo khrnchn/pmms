@@ -15,7 +15,9 @@ use Closure;
 use Illuminate\Support\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\TextInput\Mask;
 use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -34,6 +36,7 @@ class SaleResource extends Resource
     protected static ?string $navigationGroup = 'Shop';
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+
 
     public static function form(Form $form): Form
     {
@@ -88,15 +91,37 @@ class SaleResource extends Resource
 
                         Forms\Components\TextInput::make('qty')
                             ->label('Quantity')
-                            ->numeric()
-                            ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                            ->integer()
+                            ->extraInputAttributes(['min' => '0'])
+                            ->rules([
+                                function ($get) {
+                                    return function (string $attribute, $value, Closure $fail) use ($get) {
+                                        $itemQty = Inventory::where('id', $get('inventory_id'))->value('qty');
+
+                                        if ($value > $itemQty) {
+                                            // Notification::make()
+                                            //     ->title('Invalid item\'s quantity!')
+                                            //     ->warning()
+                                            //     ->send();
+                                            $fail("The quantity entered exceeds the available inventory");
+                                        }
+                                    };
+                                },
+                            ])
                             ->required()
                             ->reactive()
                             ->disabled(fn (callable $get) => blank($get('inventory_id')))
-                            ->afterStateUpdated(function ($get, callable $set) {
+                            ->afterStateUpdated(function (callable $get, callable $set) {
+
+
                                 $unitPrice = $get('unit_price') ?? 0;
                                 $qty = $get('qty') ?? 1;
                                 $total = $unitPrice * $qty;
+
+                                // $paidAmt = $get('balance_amount');
+
+                                // dd($paidAmt);
+
                                 $set('total', $total);
                             })
                             ->columns(1),
@@ -135,10 +160,11 @@ class SaleResource extends Resource
 
                                 Request::session()->put('total_price', $total);
 
-                                return $total;
+                                return number_format($total, 2);
                             }),
                     ])
                     ->inlineLabel()
+                    ->columnSpan(2),
             ];
         }
 
@@ -147,47 +173,61 @@ class SaleResource extends Resource
                 ->schema([
                     Placeholder::make("total_price_next")
                         ->label("Total Price (MYR)")
-                        ->content(Request::session()->get('total_price')),
+                        ->content(function ($get) {
+                            $total = collect($get('inventories'))
+                                ->pluck('total')
+                                ->sum();
+
+                            return number_format($total, 2);
+                        }),
                 ])
                 ->inlineLabel()
-                ->columnSpan('full'),
+                ->columnSpan(3),
 
-            Forms\Components\TextInput::make('payable_amount')
-                ->label("Paid Amount (MYR)")
-                ->numeric()
-                ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
-                ->required()
-                ->reactive()
-                ->afterStateUpdated(function ($state, callable $set) {
-                    $totalPrice = Request::session()->get('total_price');
-                    $paidAmt = $state;
-                    $balanceAmt = $paidAmt - $totalPrice;
-                    $set('balance_amount', $balanceAmt);
-                })
-                ->columns(1),
+            Fieldset::make('Payment')
+                ->relationship('payment')
+                ->dehydrated()
+                ->schema([
+                    Forms\Components\TextInput::make('payable_amount')
+                        ->label("Paid Amount (MYR)")
+                        ->numeric()
+                        ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                            $totalPrice = collect($get('../inventories'))
+                                ->pluck('total')
+                                ->sum();
+                            $paidAmt = $state;
+                            $balanceAmt = $paidAmt - $totalPrice;
+                            $set('balance_amount', $balanceAmt);
+                        })
+                        ->columns(1),
 
-            Forms\Components\TextInput::make('balance_amount')
-                ->label("Balance Amount (MYR)")
-                ->numeric()
-                ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
-                ->disabled()
-                ->required()
-                ->columns(1),
+                    Forms\Components\TextInput::make('balance_amount')
+                        ->label("Balance Amount (MYR)")
+                        ->numeric()
+                        ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
+                        ->disabled()
+                        ->required()
+                        ->columns(1),
 
-            Forms\Components\Select::make('method')
-                ->options([
-                    PaymentMethod::Cash => 'Cash',
-                    PaymentMethod::QRCode => 'QR Code',
-                    PaymentMethod::BankAccount => 'Bank transfer',
-                ])
-                ->required()
-                ->columns(1),
+                    Forms\Components\Select::make('method')
+                        ->options([
+                            PaymentMethod::Cash => 'Cash',
+                            PaymentMethod::QRCode => 'QR Code',
+                            PaymentMethod::BankAccount => 'Bank transfer',
+                        ])
+                        ->required()
+                        ->columns(1),
+                ])->columnSpan(3),
         ];
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Cashier name')
@@ -197,11 +237,19 @@ class SaleResource extends Resource
                 Tables\Columns\TextColumn::make('total_price')
                     ->sortable()
                     ->toggleable(),
+<<<<<<< HEAD
                 BadgeColumn::make('status')
                     ->colors([
                         'warning' => static fn ($state): bool => $state === 'pending',
                         'success' => static fn ($state): bool => $state === 'success',
                         'danger' => static fn ($state): bool => $state === 'failed',
+=======
+                Tables\Columns\BadgeColumn::make('status')
+                    ->colors([
+                        'danger' => 'failed',
+                        'warning' => 'pending',
+                        'success' => 'success',
+>>>>>>> sye
                     ]),
             ])
             ->filters([
@@ -239,6 +287,7 @@ class SaleResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
+<<<<<<< HEAD
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->action(function () {
@@ -252,6 +301,9 @@ class SaleResource extends Resource
                 FilamentExportHeaderAction::make('export')
                     ->label('Generate report'),
             ]);;
+=======
+            ->bulkActions([]);
+>>>>>>> sye
     }
 
     public static function getWidgets(): array
@@ -273,15 +325,5 @@ class SaleResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScope(SoftDeletingScope::class);
-    }
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['user.name'];
-    }
-
-    protected static function getGlobalSearchEloquentQuery(): Builder
-    {
-        return parent::getGlobalSearchEloquentQuery()->with(['user', 'inventories']);
     }
 }

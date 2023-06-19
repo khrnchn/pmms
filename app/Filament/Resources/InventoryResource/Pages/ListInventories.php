@@ -8,11 +8,7 @@ use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\InventoryResource\Widgets\InventoryOverview;
 use App\Models\DailyStock;
 use App\Models\Inventory;
-use App\Models\Sales;
-use App\Models\SalesItem;
-use App\Models\User;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
+use App\Models\SaleInventory;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
@@ -68,7 +64,7 @@ class ListInventories extends ListRecords
                                 ])->whereBetween('created_at', [$start, $end])
                                     ->value('after');
 
-                                $item['sold'] = SalesItem::where([
+                                $item['sold'] = SaleInventory::where([
                                     'inventory_id' => $key,
                                 ])->whereBetween('created_at', [$start, $end])
                                     ->value('qty');

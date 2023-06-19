@@ -37,14 +37,14 @@ class CreateSale extends CreateRecord
 
                 if ($item['qty'] > $inventory->qty) {
                     Notification::make()
-                        ->title('Invalid quantity!')
+                        ->title('Invalid item\'s quantity!')
                         ->warning()
                         ->send();
-                        
-                    throw new \Exception('Invalid quantity');
-                }
 
-                $inventory->update(['qty' => $inventory->qty - $item['qty']]);
+                    throw new \Exception('Invalid quantity');
+                } else {
+                    $inventory->update(['qty' => $inventory->qty - $item['qty']]);
+                }
             }
 
             $userId = Auth::user()->id;
@@ -54,9 +54,9 @@ class CreateSale extends CreateRecord
 
             $sale = Sale::create($data);
 
-            $data['sale_id'] = $sale->id;
+            // $data['sale_id'] = $sale->id;
 
-            Payment::create($data);
+            // Payment::create($data);
 
             return $sale;
         } catch (\Exception $e) {

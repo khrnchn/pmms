@@ -9,7 +9,6 @@ use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\InventoryResource\Widgets\InventoryOverview;
 use App\Models\DailyStock;
 use App\Models\Inventory;
-<<<<<<< HEAD
 use App\Models\Payment;
 use App\Models\Sale;
 use App\Models\SaleInventory;
@@ -18,9 +17,6 @@ use App\Models\SalesItem;
 use App\Models\User;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
-=======
-use App\Models\SaleInventory;
->>>>>>> sye
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;

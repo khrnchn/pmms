@@ -237,19 +237,11 @@ class SaleResource extends Resource
                 Tables\Columns\TextColumn::make('total_price')
                     ->sortable()
                     ->toggleable(),
-<<<<<<< HEAD
                 BadgeColumn::make('status')
                     ->colors([
                         'warning' => static fn ($state): bool => $state === 'pending',
                         'success' => static fn ($state): bool => $state === 'success',
                         'danger' => static fn ($state): bool => $state === 'failed',
-=======
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'danger' => 'failed',
-                        'warning' => 'pending',
-                        'success' => 'success',
->>>>>>> sye
                     ]),
             ])
             ->filters([
@@ -287,7 +279,6 @@ class SaleResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-<<<<<<< HEAD
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->action(function () {
@@ -301,9 +292,6 @@ class SaleResource extends Resource
                 FilamentExportHeaderAction::make('export')
                     ->label('Generate report'),
             ]);;
-=======
-            ->bulkActions([]);
->>>>>>> sye
     }
 
     public static function getWidgets(): array

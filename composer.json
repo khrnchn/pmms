@@ -14,6 +14,7 @@
         "awcodes/overlook": "^1.0",
         "awcodes/shout": "^1.0",
         "bensampo/laravel-enum": "^6.3",
+        "bezhansalleh/filament-shield": "^2.4",
         "buildix/timex": "^1.1",
         "filament/filament": "^2.17",
         "filament/notifications": "^2.17",

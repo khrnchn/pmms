@@ -30,6 +30,8 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -37,6 +39,31 @@ use Illuminate\Support\Str;
 class ListInventories extends ListRecords
 {
     protected static string $resource = InventoryResource::class;
+
+    protected function getTableRecordClassesUsing(): ?Closure
+    {
+        return function (Inventory $inventory): ?array {
+            if ($inventory->qty < $inventory->security_stock) {
+                return [
+                    'bg-rose-300',
+                    'dark:bg-rose-900' => config('filament.dark_mode'),
+                    'border-l-2 border-rose-300',
+                    'dark:border-rose-900' => config('tables.dark_mode'),
+                ];
+            }
+
+            return null;
+        };
+    }
+
+    protected function getTableQuery(): Builder
+    {
+        $securityStock = 10;
+
+        return Inventory::query()
+            ->orderByRaw("CASE WHEN qty < $securityStock THEN 0 ELSE 1 END")
+            ->orderBy('created_at', 'desc');
+    }
 
     protected function getActions(): array
     {

@@ -12,6 +12,7 @@ use App\Models\Inventory;
 use Awcodes\Shout\Shout;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -21,6 +22,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use PDO;
 
 class InventoryResource extends Resource
 {
@@ -169,6 +172,32 @@ class InventoryResource extends Resource
                 //
             ])
             ->actions([
+                Action::make('restock')
+                    ->action(function ($record, $data) {
+                        $quantity = $data['quantity'];
+
+                        $inventory = Inventory::find($record->id);
+
+                        $newQty = $inventory->qty + $quantity;
+
+                        $inventory->qty = $newQty;
+
+                        $inventory->save();
+
+                        Notification::make('restock')
+                            ->success()
+                            ->body('Successfully restocked ' . $quantity . ' ' . $record->name . '!')
+                            ->send();
+                    })
+                    ->form([
+                        TextInput::make('quantity')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1)
+                    ])
+                    ->modalWidth('sm')
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('success'),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

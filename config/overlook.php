@@ -13,7 +13,6 @@ return [
         InventoryResource::class,
         ReportResource::class,
         BrandResource::class,
-        UserResource::class,
     ],
     'excludes' => [
         // App\Filament\Resources\Blog\AuthorResource::class,

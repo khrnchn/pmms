@@ -16,6 +16,7 @@
         "bensampo/laravel-enum": "^6.3",
         "buildix/timex": "^1.1",
         "filament/filament": "^2.17",
+        "filament/notifications": "^2.17",
         "filament/spatie-laravel-translatable-plugin": "^2.17",
         "flowframe/laravel-trend": "^0.1.5",
         "guzzlehttp/guzzle": "^7.2",

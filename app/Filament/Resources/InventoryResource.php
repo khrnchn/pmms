@@ -76,13 +76,14 @@ class InventoryResource extends Resource
                         Forms\Components\Section::make('Pricing')
                             ->schema([
                                 Forms\Components\TextInput::make('price')
+                                ->label('Price (MYR)')
                                     ->numeric()
                                     ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
                                     ->columnSpan(1)
                                     ->required(),
 
                                 Forms\Components\TextInput::make('cost')
-                                    ->label('Cost per item')
+                                    ->label('Cost per item (MYR)')
                                     ->helperText('Customers won\'t see this price.')
                                     ->numeric()
                                     ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
@@ -170,8 +171,8 @@ class InventoryResource extends Resource
                     ->toggleable(),
 
                 BadgeColumn::make('status')
-                    ->getStateUsing( function ($record) {
-                        if($record->qty < $record->security_stock) {
+                    ->getStateUsing(function ($record) {
+                        if ($record->qty < $record->security_stock) {
                             return 'low on stock';
                         } else {
                             return 'in stock';
@@ -238,6 +239,11 @@ class InventoryResource extends Resource
         return [
             InventoryOverview::class,
         ];
+    }
+
+    protected static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 
     public static function getPages(): array

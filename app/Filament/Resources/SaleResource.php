@@ -122,7 +122,7 @@ class SaleResource extends Resource
 
                                 // dd($paidAmt);
 
-                                $set('total', $total);
+                                $set('total', number_format((float)$total, 2, '.', ''));
                             })
                             ->columns(1),
 
@@ -200,7 +200,7 @@ class SaleResource extends Resource
                                 ->sum();
                             $paidAmt = $state;
                             $balanceAmt = $paidAmt - $totalPrice;
-                            $set('balance_amount', $balanceAmt);
+                            $set('balance_amount', number_format((float)$balanceAmt, 2, '.', ''));
                         })
                         ->columns(1),
 

@@ -2,10 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\PaymentMethod;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Filament\Resources\PaymentResource\RelationManagers;
+use App\Models\Inventory;
 use App\Models\Payment;
+use App\Models\SaleInventory;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -66,6 +69,18 @@ class PaymentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('hehe')
+                    ->label('Items')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable()
+                    ->getStateUsing(function ($record) {
+                        $inventoryIds = SaleInventory::where('sale_id', $record->id)->pluck('inventory_id');
+                        $inventoryNames = Inventory::whereIn('id', $inventoryIds)->pluck('name');
+                        foreach ($inventoryNames as $name) {
+                            echo $name . '<br>';
+                        }
+                    }),
                 Tables\Columns\TextColumn::make('payable_amount')
                     ->sortable()
                     ->toggleable(),
@@ -115,7 +130,11 @@ class PaymentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Sales report'),
+            ]);
     }
 
     public static function getRelations(): array

@@ -14,10 +14,14 @@ class ListSales extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
-            Actions\Action::make('Payment list')->action(function ($livewire): void {
-                $livewire->redirect(PaymentResource::getUrl('index'));
-            }),
+            Actions\CreateAction::make()
+                ->icon('heroicon-o-plus-circle'),
+                
+            Actions\Action::make('Payment list')
+                ->icon('heroicon-o-clipboard-list')
+                ->action(function ($livewire): void {
+                    $livewire->redirect(PaymentResource::getUrl('index'));
+                }),
         ];
     }
 

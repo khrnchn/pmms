@@ -2,7 +2,6 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 const colors = require('tailwindcss/colors');
 
 /** @type {import('tailwindcss').Config} */
-
 module.exports = {
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
@@ -27,8 +26,16 @@ module.exports = {
         },
     },
 
+    safelist: [
+        'border-l-2',
+        'border-rose-300',
+        'dark:border-rose-900',
+        'bg-rose-300',
+        'dark:bg-rose-900'
+    ],
+
     plugins: [
         require('@tailwindcss/forms'),
-        require('@tailwindcss/typography')
+        require('@tailwindcss/typography'),
     ],
 };

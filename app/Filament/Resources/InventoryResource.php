@@ -12,15 +12,18 @@ use App\Models\Inventory;
 use Awcodes\Shout\Shout;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Filters\Filter;
+
 
 class InventoryResource extends Resource
 {
@@ -72,32 +75,23 @@ class InventoryResource extends Resource
                         Forms\Components\Section::make('Pricing')
                             ->schema([
                                 Forms\Components\TextInput::make('price')
-                                    ->numeric()
-                                    ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
-                                    ->columnSpan(1)
-                                    ->required(),
-
-                                Forms\Components\TextInput::make('old_price')
-                                    ->label('Compare at price')
+                                    ->label('Price (MYR)')
                                     ->numeric()
                                     ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
                                     ->columnSpan(1)
                                     ->required(),
 
                                 Forms\Components\TextInput::make('cost')
-                                    ->label('Cost per item')
+                                    ->label('Cost per item (MYR)')
                                     ->helperText('Customers won\'t see this price.')
                                     ->numeric()
                                     ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
                                     ->columnSpan(1)
                                     ->required(),
                             ])
-                            ->columns(3),
+                            ->columns(2),
                         Forms\Components\Section::make('Inventory')
                             ->schema([
-                                Forms\Components\TextInput::make('sku')
-                                    ->label('SKU (Stock Keeping Unit)')
-                                    ->unique(Inventory::class, 'sku', ignoreRecord: true),
 
                                 Forms\Components\TextInput::make('qty')
                                     ->label('Quantity')
@@ -123,11 +117,13 @@ class InventoryResource extends Resource
                                 Forms\Components\Toggle::make('is_visible')
                                     ->label('Visible')
                                     ->inline(false)
+                                    ->default(true)
                                     ->helperText('This inventory will be hidden from all sales channels.'),
 
                                 Forms\Components\Select::make('brand_id')
                                     ->relationship('brand', 'name')
                                     ->searchable()
+                                    ->required()
                                     ->hiddenOn(InventoriesRelationManager::class),
                             ]),
                     ])
@@ -156,11 +152,6 @@ class InventoryResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('sku')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(),
-
                 Tables\Columns\TextColumn::make('qty')
                     ->label(__('Quantity'))
                     ->searchable()
@@ -177,18 +168,64 @@ class InventoryResource extends Resource
                     ->label('Visibility')
                     ->sortable()
                     ->toggleable(),
+
+                BadgeColumn::make('status')
+                    ->getStateUsing(function ($record) {
+                        if ($record->qty < $record->security_stock) {
+                            return 'low on stock';
+                        } else {
+                            return 'in stock';
+                        }
+                    })
+                    ->enum([
+                        'low on stock' => 'Low on stock',
+                        'in stock' => 'In stock',
+                    ])
+                    ->colors([
+                        'danger' => 'low on stock',
+                        'success' => 'in stock',
+                    ])
             ])
             ->filters([
-                //
+                Filter::make('in stock')
+                    ->query(fn (Builder $query): Builder => $query->where('qty', '>', 10)),
+                Filter::make('low on stock')
+                    ->query(fn (Builder $query): Builder => $query->where('qty', '<', 10))
             ])
             ->actions([
+                Action::make('restock')
+                    ->action(function ($record, $data) {
+                        $quantity = $data['quantity'];
+
+                        $inventory = Inventory::find($record->id);
+
+                        $newQty = $inventory->qty + $quantity;
+
+                        $inventory->qty = $newQty;
+
+                        $inventory->save();
+
+                        Notification::make('restock')
+                            ->success()
+                            ->body('Successfully restocked ' . $quantity . ' ' . $record->name . '!')
+                            ->send();
+                    })
+                    ->form([
+                        TextInput::make('quantity')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1)
+                    ])
+                    ->modalWidth('sm')
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('success'),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ])->headerActions([
                 FilamentExportHeaderAction::make('export')
-                    ->label('Generate report'),
+                    ->label('Inventory report'),
             ]);
     }
 
@@ -204,6 +241,11 @@ class InventoryResource extends Resource
         return [
             InventoryOverview::class,
         ];
+    }
+
+    protected static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 
     public static function getPages(): array

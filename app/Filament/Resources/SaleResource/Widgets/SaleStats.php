@@ -28,7 +28,7 @@ class SaleStats extends BaseWidget
                         ->toArray()
                 ),
             // Card::make('Open orders', Order::whereIn('status', ['open', 'processing'])->count()),
-            Card::make('Average price (MYR)', number_format(Sale::avg('total_price'), 2)),
+            Card::make('Average Sales (MYR)', number_format(Sale::avg('total_price'), 2)),
         ];
     }
 }

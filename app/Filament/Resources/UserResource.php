@@ -5,10 +5,12 @@ namespace App\Filament\Resources;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Filament\Resources\UserResource\Widgets\UserOverview;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -17,6 +19,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
+use PhpOption\Option;
+use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -37,6 +41,11 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
+                Select::make('role')
+                    ->options([
+                        'cashier' => 'cashier',
+                        'committee' => 'committee',
+                    ]),
                 TextInput::make('password')
                     ->password()
                     ->dehydrateStateUsing(fn ($state) => Hash::make($state))
@@ -61,6 +70,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->slideOver(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -81,6 +91,7 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
+            'create' => Pages\CreateUser::route('/create'),
             'index' => Pages\ListUsers::route('/'),
         ];
     }

@@ -69,6 +69,7 @@ class PaymentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
+<<<<<<< HEAD
                 Tables\Columns\TextColumn::make('item')
                     ->label('Items')
                     ->searchable()
@@ -81,6 +82,8 @@ class PaymentResource extends Resource
                             echo $name . '<br>';
                         }
                     }),
+=======
+>>>>>>> e00b4ebd2b87a478ae95baacc7d191027b253d7a
                 Tables\Columns\TextColumn::make('payable_amount')
                     ->sortable()
                     ->toggleable(),

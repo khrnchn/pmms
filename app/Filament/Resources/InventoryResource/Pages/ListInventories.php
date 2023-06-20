@@ -52,7 +52,7 @@ class ListInventories extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\Action::make('report')
+            Actions\Action::make('closing report')
                 ->slideOver()
                 ->icon('heroicon-o-document-report')
                 ->color('success')

@@ -11,6 +11,7 @@ use App\Forms\Components\PaymentForm;
 use App\Models\Inventory;
 use App\Models\Payment;
 use App\Models\Sale;
+use App\Models\SaleInventory;
 use Closure;
 use Illuminate\Support\Carbon;
 use Filament\Forms;
@@ -28,6 +29,7 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Request;
+use PDO;
 
 class SaleResource extends Resource
 {
@@ -234,6 +236,19 @@ class SaleResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
+                TextColumn::make('inventories.name')
+                    ->label('Items')
+                    ->getStateUsing(function ($record) {
+                        $items = $record->inventories;
+
+                        foreach ($items as $item) {
+                            $inventory = Inventory::find($item->inventory_id);
+                            $inventoryName = $inventory->name;
+                            $inventoryQty = $item->qty;
+
+                            echo $inventoryName . ' x' . $inventoryQty . '<br>';
+                        }
+                    }),
                 Tables\Columns\TextColumn::make('total_price')
                     ->sortable()
                     ->toggleable(),

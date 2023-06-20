@@ -69,18 +69,6 @@ class PaymentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('hehe')
-                    ->label('Items')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable()
-                    ->getStateUsing(function ($record) {
-                        $inventoryIds = SaleInventory::where('sale_id', $record->id)->pluck('inventory_id');
-                        $inventoryNames = Inventory::whereIn('id', $inventoryIds)->pluck('name');
-                        foreach ($inventoryNames as $name) {
-                            echo $name . '<br>';
-                        }
-                    }),
                 Tables\Columns\TextColumn::make('payable_amount')
                     ->sortable()
                     ->toggleable(),

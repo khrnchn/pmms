@@ -12,7 +12,7 @@ class InventoryOverview extends BaseWidget
     {
         return [
             Card::make('Total inventories', Inventory::all()->count()),
-            Card::make('Low on stock', Inventory::where('qty', '<', 'security_stock')->count()),
+            Card::make('Low on stock', Inventory::where('qty', '<', 10)->count() . ' inventories'),
             Card::make('Hidden inventories', Inventory::where('is_visible', false)->count()),
         ];
     }

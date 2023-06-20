@@ -19,12 +19,11 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\BadgeColumn;
-use Illuminate\Support\Facades\Auth;
-use PDO;
+use Filament\Tables\Filters\Filter;
+
 
 class InventoryResource extends Resource
 {
@@ -76,7 +75,7 @@ class InventoryResource extends Resource
                         Forms\Components\Section::make('Pricing')
                             ->schema([
                                 Forms\Components\TextInput::make('price')
-                                ->label('Price (MYR)')
+                                    ->label('Price (MYR)')
                                     ->numeric()
                                     ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
                                     ->columnSpan(1)
@@ -188,7 +187,10 @@ class InventoryResource extends Resource
                     ])
             ])
             ->filters([
-                //
+                Filter::make('in stock')
+                    ->query(fn (Builder $query): Builder => $query->where('qty', '>', 10)),
+                Filter::make('low on stock')
+                    ->query(fn (Builder $query): Builder => $query->where('qty', '<', 10))
             ])
             ->actions([
                 Action::make('restock')

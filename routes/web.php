@@ -1,5 +1,6 @@
 <?php
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect('/petakoop');
 });
+
+Route::get('/petakoop/report', function () {
+    $pdf = Pdf::loadView('report');
+    return $pdf->download('report.pdf')->header('Content-Type', 'application/pdf');
+});
+

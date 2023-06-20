@@ -40,22 +40,6 @@ class ListInventories extends ListRecords
 {
     protected static string $resource = InventoryResource::class;
 
-    protected function getTableRecordClassesUsing(): ?Closure
-    {
-        return function (Inventory $inventory): ?array {
-            if ($inventory->qty < $inventory->security_stock) {
-                return [
-                    'bg-rose-300',
-                    'dark:bg-rose-900' => config('filament.dark_mode'),
-                    'border-l-2 border-rose-300',
-                    'dark:border-rose-900' => config('tables.dark_mode'),
-                ];
-            }
-
-            return null;
-        };
-    }
-
     protected function getTableQuery(): Builder
     {
         $securityStock = 10;
@@ -86,7 +70,7 @@ class ListInventories extends ListRecords
                     // generate report
 
                     // redirect 
-                    // $livewire->redirect(InventoryResource::getURL('index'));
+                    $livewire->redirect('report');
                 })
                 ->form([
                     TextInput::make('date')

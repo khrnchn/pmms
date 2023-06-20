@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\BadgeColumn;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 
@@ -167,6 +168,23 @@ class InventoryResource extends Resource
                     ->label('Visibility')
                     ->sortable()
                     ->toggleable(),
+
+                BadgeColumn::make('status')
+                    ->getStateUsing( function ($record) {
+                        if($record->qty < $record->security_stock) {
+                            return 'low on stock';
+                        } else {
+                            return 'in stock';
+                        }
+                    })
+                    ->enum([
+                        'low on stock' => 'Low on stock',
+                        'in stock' => 'In stock',
+                    ])
+                    ->colors([
+                        'danger' => 'low on stock',
+                        'success' => 'in stock',
+                    ])
             ])
             ->filters([
                 //

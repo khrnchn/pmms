@@ -69,7 +69,7 @@ class PaymentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('hehe')
+                Tables\Columns\TextColumn::make('item')
                     ->label('Items')
                     ->searchable()
                     ->sortable()

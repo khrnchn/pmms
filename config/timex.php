@@ -62,7 +62,7 @@ return [
 
     'pages' => [
         'timex' => \Buildix\Timex\Pages\Timex::class,
-        'slug' => 'events',
+        'slug' => 'rosters',
         'group' => 'Roster',
         'sort' => 0,
         'shouldRegisterNavigation' => true,

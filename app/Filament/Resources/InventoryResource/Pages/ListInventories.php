@@ -40,6 +40,7 @@ class ListInventories extends ListRecords
 {
     protected static string $resource = InventoryResource::class;
 
+    // display inventories that are low on stock first
     protected function getTableQuery(): Builder
     {
         $securityStock = 10;
@@ -52,6 +53,7 @@ class ListInventories extends ListRecords
     protected function getActions(): array
     {
         return [
+            // action for creating closing report
             Actions\Action::make('closing report')
                 ->slideOver()
                 ->icon('heroicon-o-document-report')
@@ -69,7 +71,7 @@ class ListInventories extends ListRecords
 
                     // generate report
 
-                    // redirect 
+                    // redirect
                     $livewire->redirect('report');
                 })
                 ->form([
@@ -237,6 +239,7 @@ class ListInventories extends ListRecords
                     ])->columns(4),
                 ]),
 
+            // action for creating inventory
             Actions\CreateAction::make()
                 ->icon('heroicon-o-plus-circle'),
         ];

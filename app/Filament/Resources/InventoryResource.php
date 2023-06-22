@@ -35,11 +35,12 @@ class InventoryResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // inputs for creating inventory
         return $form
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-
+                        // inventory alert if low on stock
                         Shout::make('danger')
                             ->content(fn ($record) => $record->qty < $record->security_stock ? 'This inventory is low on stock!' : '')
                             ->type('danger')
@@ -136,7 +137,7 @@ class InventoryResource extends Resource
     {
         return $table
             ->columns([
-
+                // columns for inventory table
                 Tables\Columns\TextColumn::make('name')
                     ->label('Name')
                     ->searchable()
@@ -169,8 +170,10 @@ class InventoryResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
+                // badgecolumn showing the status of the inventory
                 BadgeColumn::make('status')
                     ->getStateUsing(function ($record) {
+                        // query for inventory quantity
                         if ($record->qty < $record->security_stock) {
                             return 'low on stock';
                         } else {
@@ -181,21 +184,23 @@ class InventoryResource extends Resource
                         'low on stock' => 'Low on stock',
                         'in stock' => 'In stock',
                     ])
-                    ->colors([
+                    ->colors([ // determine badge colour based on query
                         'danger' => 'low on stock',
                         'success' => 'in stock',
                     ])
             ])
             ->filters([
+                // filters for in stock/ low on stock inventory
                 Filter::make('in stock')
                     ->query(fn (Builder $query): Builder => $query->where('qty', '>', 10)),
                 Filter::make('low on stock')
                     ->query(fn (Builder $query): Builder => $query->where('qty', '<', 10))
             ])
             ->actions([
+                // action for restocking inventory
                 Action::make('restock')
                     ->action(function ($record, $data) {
-                        $quantity = $data['quantity'];
+                        $quantity = $data['quantity']; // get qty from array $data
 
                         $inventory = Inventory::find($record->id);
 

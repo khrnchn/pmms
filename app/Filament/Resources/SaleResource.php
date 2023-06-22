@@ -42,6 +42,7 @@ class SaleResource extends Resource
 
     public static function form(Form $form): Form
     {
+        //to call forms
         return $form
             ->schema([
                 Forms\Components\Group::make()
@@ -69,6 +70,7 @@ class SaleResource extends Resource
             ])->columns(3);
     }
 
+    //forms to create/edit sales
     public static function getFormSchema(?string $section = null): array
     {
         if ($section === 'inventories') {
@@ -81,6 +83,7 @@ class SaleResource extends Resource
                             ->label('Item')
                             ->searchable()
                             ->options(function () {
+                                //display only existed inventory
                                 return Inventory::where('qty', '>', 0)->pluck('name', 'id');
                             })
                             ->required()
